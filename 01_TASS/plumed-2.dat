@@ -1,0 +1,85 @@
+#This is plumed input file for TASS windows 09.00 to 15.00 Angstrom. 
+#This is for the US between the center of mass of beta lactam ring and the beta carbon of the ser62 residue
+WHOLEMOLECULES ENTITY0=1-5558
+c1: COM ATOMS=5535,5537,5540,5541
+dis: DISTANCE ATOMS=c1,927
+dist: MATHEVAL ARG=dis FUNC=30.0*x PERIODIC=NO
+
+#####################################################################
+#To define all the protein donor atoms and ligand acceptor atoms observable upto 20 Ang US runs.
+#Define the H-bonds CV. 
+pro_d: GROUP ATOMS=925,932,4876,4883,4426,4416,5255,5304,5295,5350,5353,1782,2325,3259,4901,4910,4400,5309,1751,4412,2258,2261
+lig_a: GROUP ATOMS=5546,5547,5548,5543,5544,5542,5539
+
+hbond1: COORDINATION GROUPA=pro_d GROUPB=lig_a R_0=0.32
+#--------------------------------------------------------------------
+lig_d: GROUP ATOMS=5539
+pro_a: GROUP ATOMS=1781,1769,2298,5254,5303,1781,2324,4909,4399,4415,4886,4390,4865
+
+hbond2: COORDINATION GROUPA=lig_d GROUPB=pro_a R_0=0.32
+#--------------------------------------------------------------------
+
+hbonds: COMBINE ARG=hbond1,hbond2  POWERS=1,1 COEFFICIENTS=1.0,1.0 PERIODIC=NO
+#======================================================================
+#To define the active site coordination number, defining ActInt CV, not used in these windows. 
+#Oxyanion Hydrognes and carbonly carbon coordination number 
+#Ser64  oxygen and avibactam carbonyl carbon coordination nubmer. 
+#cn1: COORDINATION GROUPA=932 GROUPB=5537 R_0=0.35
+#cn2: COORDINATION GROUPA=5543 GROUPB=926,4877 R_0=0.28
+
+#cn3: COMBINE ARG=cn1,cn2  POWERS=1,1 COEFFICIENTS=1.0,1.0 PERIODIC=NO
+#=====================================================================
+#To define all the Oxygen of water molecule
+OW: GROUP ATOMS=5580-101099:3
+
+LIG_HEAVY: GROUP ATOMS=5532-5548
+
+ACT_HEAVY: GROUP ATOMS=925,932,4876,4883,4426,4416,5255,5304,5295,5350,5353,1782,2325,4901,4910,2298,5303,4400,4886,4865,4909
+
+#ProSolv CV
+PROsolv: COORDINATION GROUPA=ACT_HEAVY GROUPB=OW R_0=0.4 NLIST NL_CUTOFF=01.2 NL_STRIDE=100
+
+#LigSolv CV
+LIGsolv: COORDINATION GROUPA=LIG_HEAVY GROUPB=OW R_0=0.4 NLIST NL_CUTOFF=01.2 NL_STRIDE=100
+#=====================================================================
+
+#Six COM For outer Protein active site sampling, to define  OutDis CV
+d1: COM ATOMS=4294,4316,4340
+d2: COM ATOMS=240,256,273,295
+d3: COM ATOMS=3152,3164,3196
+d4: COM ATOMS=3261,3276,3282
+d5: COM ATOMS=2033,2054,2078
+d6: COM ATOMS=2216,2227,2244
+
+#------------------------------------------------------------------------------
+dis11: DISTANCE ATOMS=d1,c1
+dis12: DISTANCE ATOMS=d1,5545
+dis13: DISTANCE ATOMS=d1,5539
+dis21: DISTANCE ATOMS=d2,c1
+dis22: DISTANCE ATOMS=d2,5545
+dis23: DISTANCE ATOMS=d2,5539
+dis31: DISTANCE ATOMS=d3,c1
+dis32: DISTANCE ATOMS=d3,5545
+dis33: DISTANCE ATOMS=d3,5539
+dis41: DISTANCE ATOMS=d4,c1
+dis42: DISTANCE ATOMS=d4,5545
+dis43: DISTANCE ATOMS=d4,5539
+dis51: DISTANCE ATOMS=d5,c1
+dis52: DISTANCE ATOMS=d5,5545
+dis53: DISTANCE ATOMS=d5,5539
+dis61: DISTANCE ATOMS=d6,c1
+dis62: DISTANCE ATOMS=d6,5545
+dis63: DISTANCE ATOMS=d6,5539
+
+#====================================================================
+ex: EXTENDED_LAGRANGIAN ARG=dist,hbonds,PROsolv,LIGsolv,dis11,dis12,dis13,dis21,dis22,dis23,dis31,dis32,dis33,dis41,dis42,dis43,dis51,dis52,dis53,dis61,dis62,dis63 KAPPA=5260,5260,5260,5260,5260,5260,5260,5260,5260,5260,5260,5260,5260,5260,5260,5260,5260,5260,5260,5260,5260,5260  TAU=0.062,0.062,0.062,0.062,0.062,0.062,0.062,0.062,0.062,0.062,0.062,0.062,0.062,0.062,0.062,0.062,0.062,0.062,0.062,0.062,0.062,0.062 FRICTION=100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100 TEMP=3000
+
+restraint-ex.dis_fict: RESTRAINT ARG=ex.dist_fict KAPPA=100 AT=027.0
+
+#####################################################################
+PRINT STRIDE=20 ARG=ex.dist_fict,ex.hbonds_fict,ex.PROsolv_fict,ex.LIGsolv_fict  FILE=COLVAR
+
+PRINT STRIDE=20 ARG=dist,hbonds,PROsolv,LIGsolv  FILE=COLVAR_CC
+
+PRINT STRIDE=100 ARG=ex.dist_vfict,ex.hbonds_vfict,ex.PROsolv_vfict,ex.LIGsolv_vfict FILE=TEMP
+
