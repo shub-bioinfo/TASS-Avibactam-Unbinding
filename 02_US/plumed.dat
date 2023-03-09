@@ -1,0 +1,13 @@
+#KpYnKp system plumed file. 
+#This is for the US between the center of mass of beta lactam ring and the beta carbon of the ser62 residue
+RESTART
+WHOLEMOLECULES ENTITY0=1-5558
+c1: COM ATOMS=5535,5537,5540,5541
+dis: DISTANCE ATOMS=c1,927
+#dist: MATHEVAL ARG=dis FUNC=30.0*x PERIODIC=NO
+#metad: METAD ARG=d PACE=1000 HEIGHT=1.0 SIGMA=0.05 FILE=HILLS
+#####################################################################
+cv: RESTRAINT ARG=dis KAPPA=14000 AT=0.50
+
+#####################################################################
+PRINT STRIDE=10 ARG=dis FILE=COLVAR
